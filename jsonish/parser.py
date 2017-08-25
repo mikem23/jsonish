@@ -127,6 +127,7 @@ class Parser(object):
                 key = part
             else:
                 this[key] = part
+                key = None
         # not reached
 
 

@@ -19,7 +19,7 @@ class TestParser(unittest.TestCase):
             {},
             {"a": 1},
             {"a": 1, "b": 2},
-            #{"a": 1, "b": ["two", {"c": 3.3}]},
+            {"a": 1, "b": ["two", {"c": 3.3}]},
             ]
 
     def test_simple(self):
