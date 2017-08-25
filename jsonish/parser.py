@@ -1,16 +1,15 @@
-
-
 def parse(data):
     return Parser(data).parse()
 
 
 WHITESPACE = (' ', '\t', '\r', '\n')
-NUMERIC = [str(i) for i in range(10)] +  ['-', '.']
+NUMERIC = [str(i) for i in range(10)] + ['-', '.']
 
 
 class Token(object):
     def __init__(self, name):
         self.name = name
+
 
 EndBrace = Token('}')
 EndBracket = Token(']')
@@ -31,7 +30,7 @@ class Parser(object):
         return self.parse_open()
 
     def parse_open(self):
-        # begin parsing in the open state, meaning we are not inside anything yet
+        # begin parsing in the open state
         while self.offset < len(self.data):
             c = self.data[self.offset]
             self.offset += 1
@@ -71,7 +70,7 @@ class Parser(object):
 
     def parse_comment(self):
         end = self.data.find('\n', self.offset)
-        offset = end + 1
+        self.offset = end + 1
         return Comment
 
     def parse_number(self):
@@ -129,5 +128,3 @@ class Parser(object):
                 this[key] = part
                 key = None
         # not reached
-
-
