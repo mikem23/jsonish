@@ -1,7 +1,9 @@
 jsonish
 =======
 
-This library provides an extended json parser that supports some syntax
+This is a toy project in early development.
+
+This library aims to provide an extended json parser that supports some syntax
 conveniences, such as:
 
   * bare words
