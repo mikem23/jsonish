@@ -15,6 +15,7 @@ class Token(object):
 EndBrace = Token('}')
 EndBracket = Token(']')
 Comma = Token(',')
+Colon = Token(':')
 Comment = Token('#')
 END = Token('end')
 
@@ -44,6 +45,8 @@ class Parser(object):
                 return EndBracket
             elif c == ',':
                 return Comma
+            elif c == ':':
+                return Colon
             elif c == '"':
                 return self.parse_string()
             elif c == "'":
@@ -103,4 +106,27 @@ class Parser(object):
             else:
                 this.append(part)
         # not reached
+
+    def parse_dict(self):
+        this = {}
+        key = None
+        while True:
+            part = self.parse_open()
+            if isinstance(part, Token):
+                if part is Comment:
+                    continue
+                elif part is Comma:
+                    continue
+                elif part is Colon:
+                    continue
+                elif part is EndBrace:
+                    return this
+                else:
+                    raise ValueError('Invalid syntax')
+            elif key is None:
+                key = part
+            else:
+                this[key] = part
+        # not reached
+
 

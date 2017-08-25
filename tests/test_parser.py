@@ -16,6 +16,9 @@ class TestParser(unittest.TestCase):
             #None,
             "foo",
             [1,2,"3"],
+            {},
+            {"a": 1},
+            {"a": 1, "b": 2},
             #{"a": 1, "b": ["two", {"c": 3.3}]},
             ]
 
