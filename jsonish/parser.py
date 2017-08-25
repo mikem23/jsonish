@@ -4,19 +4,23 @@ def parse(data):
 
 WHITESPACE = (' ', '\t', '\r', '\n')
 NUMERIC = [str(i) for i in range(10)] + ['-', '.']
+TOKENS = {}
 
 
 class Token(object):
     def __init__(self, name):
         self.name = name
+        TOKENS[name] = self
 
 
+Brace = Token('{')
 EndBrace = Token('}')
+Bracket = Token('[')
 EndBracket = Token(']')
 Comma = Token(',')
 Colon = Token(':')
 Comment = Token('#')
-END = Token('end')
+END = Token('')
 
 
 class Parser(object):
@@ -128,3 +132,51 @@ class Parser(object):
                 this[key] = part
                 key = None
         # not reached
+
+
+ESCAPES = {
+        '\\': '\\',
+        'n': '\n',
+        'r': '\r',
+        't': '\t',
+        '"': '"',
+        "'": "'",
+        }
+
+
+class Tokenizer(object):
+
+    def __init__(self, stream):
+        self.stream = stream
+
+    def tokenize(self):
+        for c in self.stream:
+            if c in TOKENS:
+                yield TOKENS[c]
+            elif c in ('"', "'"):
+                yield self.do_string(c)
+            elif c == '#':
+                self.do_comment()
+
+    def do_string(self, quote):
+        escape = False
+        result = cStringIO.StringIO()
+        for c in self.stream:
+            if escape:
+                if c in ESCAPES:
+                    result.write(ESCAPES[c])
+                else:
+                    raise ValueError('Invalid escape: \\%s' % c)
+            elif c == '\\':
+                escape = True
+            elif c == quote:
+                break
+        ret = result.getvalue()
+        result.close()
+        return ret
+
+    def do_comment(self):
+        # just read to end of line
+        for c in self.stream:
+            if c == '\n':
+                break
