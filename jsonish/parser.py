@@ -1,5 +1,12 @@
-def parse(data):
+import cStringIO
+
+
+def oldparse(data):
     return Parser(data).parse()
+
+
+def parse(data):
+    return TokenParser(data).parse()
 
 
 WHITESPACE = (' ', '\t', '\r', '\n')
@@ -8,9 +15,16 @@ TOKENS = {}
 
 
 class Token(object):
+
     def __init__(self, name):
         self.name = name
         TOKENS[name] = self
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return 'Token(%r)' % self.name
 
 
 Brace = Token('{')
@@ -21,6 +35,19 @@ Comma = Token(',')
 Colon = Token(':')
 Comment = Token('#')
 END = Token('')
+
+
+class BareToken(object):
+
+    def __init__(self, text):
+        self.text = text
+
+    def __str__(self):
+        return self.text
+
+    def __repr__(self):
+        return 'Bare(%r)' % self.name
+
 
 
 class Parser(object):
@@ -144,17 +171,31 @@ ESCAPES = {
         }
 
 
+def strgen(s):
+    """Turn a string into a character generator"""
+    for c in s:
+        yield c
+
+
 class Tokenizer(object):
 
     def __init__(self, stream):
-        self.stream = stream
+        if isinstance(stream, str):
+            self.stream = strgen(stream)
+        else:
+            self.stream = stream
 
     def tokenize(self):
         for c in self.stream:
+            print(c)
             if c in TOKENS:
-                yield TOKENS[c]
+                r = TOKENS[c]
+                print(r)
+                yield r
             elif c in ('"', "'"):
-                yield self.do_string(c)
+                r = self.do_string(c)
+                print(r)
+                yield r
             elif c == '#':
                 self.do_comment()
 
@@ -162,6 +203,7 @@ class Tokenizer(object):
         escape = False
         result = cStringIO.StringIO()
         for c in self.stream:
+            print("schar: %r" % c)
             if escape:
                 if c in ESCAPES:
                     result.write(ESCAPES[c])
@@ -171,8 +213,10 @@ class Tokenizer(object):
                 escape = True
             elif c == quote:
                 break
+            else:
+                result.write(c)
         ret = result.getvalue()
-        result.close()
+        print("string: %r" % ret)
         return ret
 
     def do_comment(self):
@@ -180,3 +224,42 @@ class Tokenizer(object):
         for c in self.stream:
             if c == '\n':
                 break
+
+
+class TokenParser(object):
+
+    def __init__(self, stream):
+        self.tokenizer = Tokenizer(stream)
+        self.tokens = self.tokenizer.tokenize()
+        self.items = []
+
+    def parse(self):
+        while True:
+            token = self._parse()
+            if token is END:
+                break
+            elif isinstance(token, Token):
+                raise ValueError('Unexpected token %s' % token)
+            else:
+                self.items.append(token)
+        if not self.items:
+            raise ValueError('No json data found')
+        elif len(self.items) > 1:
+            raise ValueError('Multiple json outputs found')
+            # TODO: maybe support this with an option
+        return self.items[0]
+
+
+    def _parse(self):
+        for token in self.tokens:
+            if token is Brace:
+                return self.parse_dict()
+            elif token is Bracket:
+                return self.parse_list()
+            elif isinstance(token, Token):
+                return token
+            elif isinstance(token, BareToken):
+                self.parse_bare()
+            elif isinstance(token, str):
+                return token
+        return END
