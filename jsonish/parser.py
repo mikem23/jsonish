@@ -46,7 +46,7 @@ class BareToken(object):
         return self.text
 
     def __repr__(self):
-        return 'Bare(%r)' % self.name
+        return 'Bare(%r)' % self.text
 
 
 
@@ -180,30 +180,37 @@ def strgen(s):
 class Tokenizer(object):
 
     def __init__(self, stream):
+        print("Tokenizer for: %r" % stream)
         if isinstance(stream, str):
+            print(stream)
             self.stream = strgen(stream)
         else:
+            print(type(stream))
             self.stream = stream
 
     def tokenize(self):
         for c in self.stream:
-            print(c)
+            print(": %r" % c)
             if c in TOKENS:
                 r = TOKENS[c]
-                print(r)
+                print("token: %r", r)
                 yield r
             elif c in ('"', "'"):
                 r = self.do_string(c)
-                print(r)
+                print("string: %r" % r)
                 yield r
             elif c == '#':
                 self.do_comment()
+            elif c in WHITESPACE:
+                # skip
+                pass
+            else:
+                yield self.do_token(c)
 
     def do_string(self, quote):
         escape = False
         result = cStringIO.StringIO()
         for c in self.stream:
-            print("schar: %r" % c)
             if escape:
                 if c in ESCAPES:
                     result.write(ESCAPES[c])
@@ -216,7 +223,6 @@ class Tokenizer(object):
             else:
                 result.write(c)
         ret = result.getvalue()
-        print("string: %r" % ret)
         return ret
 
     def do_comment(self):
@@ -225,30 +231,44 @@ class Tokenizer(object):
             if c == '\n':
                 break
 
+    def do_token(self, lead):
+        print('reading bare token: lead=%r' % lead)
+        result = cStringIO.StringIO()
+        result.write(lead)
+        for c in self.stream:
+            if c in WHITESPACE:
+                # end token
+                break
+            else:
+                result.write(c)
+        ret = result.getvalue()
+        print('Got bare token: %r' % ret)
+        return BareToken(ret)
+
 
 class TokenParser(object):
 
     def __init__(self, stream):
         self.tokenizer = Tokenizer(stream)
         self.tokens = self.tokenizer.tokenize()
-        self.items = []
 
     def parse(self):
+        items = []
         while True:
             token = self._parse()
+            print("got token: %r" % token)
             if token is END:
                 break
             elif isinstance(token, Token):
                 raise ValueError('Unexpected token %s' % token)
             else:
-                self.items.append(token)
-        if not self.items:
+                items.append(token)
+        if not items:
             raise ValueError('No json data found')
-        elif len(self.items) > 1:
+        elif len(items) > 1:
             raise ValueError('Multiple json outputs found')
             # TODO: maybe support this with an option
-        return self.items[0]
-
+        return items[0]
 
     def _parse(self):
         for token in self.tokens:
@@ -259,7 +279,50 @@ class TokenParser(object):
             elif isinstance(token, Token):
                 return token
             elif isinstance(token, BareToken):
-                self.parse_bare()
+                return self.parse_bare(token)
             elif isinstance(token, str):
                 return token
+        print('END')
         return END
+
+    BARE_VALUES = {
+            'true': True,
+            'false': False,
+            'null': None,
+            }
+
+    def parse_bare(self, token):
+        # bare words are either
+        # - a numeric value
+        # - a boolean value
+        # - a null value
+        # - a bare string
+        text = token.text
+        ltext = text.lower()
+        if ltext in self.BARE_VALUES:
+            return self.BARE_VALUES[ltext]
+        try:
+            return int(text)
+        except ValueError:
+            pass
+        try:
+            return float(text)
+        except ValueError:
+            pass
+        return text
+
+    def parse_list(self):
+        result = []
+        while True:
+            token = self._parse()
+            print("got token: %r" % token)
+            if token is END:
+                raise ValueError('Unclosed list')
+            elif token is EndBracket:
+                break
+            elif isinstance(token, Token):
+                raise ValueError('Unexpected token %s' % token)
+            else:
+                result.append(token)
+        return result
+ 
