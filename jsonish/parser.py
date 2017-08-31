@@ -86,8 +86,6 @@ class Tokenizer(object):
                     r = self.do_string(c)
                     print("string: %r" % r)
                     yield r
-                elif c == '#':
-                    self.do_comment()
                 elif c in WHITESPACE:
                     # skip
                     pass
