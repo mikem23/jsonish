@@ -193,9 +193,11 @@ class Tokenizer(object):
             # inner loop allows handlers to push handling back up
             while True:
                 print(": %r" % c)
-                if c in TOKENS:
+                if c == '#':
+                    self.do_comment()
+                elif c in TOKENS:
                     r = TOKENS[c]
-                    print("token: %r", r)
+                    print("token: %r" % r)
                     yield r
                 elif c in ('"', "'"):
                     r = self.do_string(c)
@@ -232,8 +234,10 @@ class Tokenizer(object):
         return ret
 
     def do_comment(self):
+        print('comment start')
         # just read to end of line
         for c in self.stream:
+            print('comment char: %r' % c)
             if c == '\n':
                 break
 
