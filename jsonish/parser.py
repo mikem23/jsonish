@@ -337,4 +337,29 @@ class TokenParser(object):
             else:
                 result.append(token)
         return result
- 
+
+    def parse_dict(self):
+        result = {}
+        key = None
+        while True:
+            token = self._parse()
+            print("got token: %r" % token)
+            if token is END:
+                raise ValueError('Unclosed dict')
+            elif token is EndBrace:
+                break
+            elif token is Colon:
+                if key is None:
+                    raise ValueError('Missing key in dictionary')
+            elif token is Comma:
+                if key is not None:
+                    raise ValueError('Unexpected comma in dictionary')
+            elif isinstance(token, Token):
+                raise ValueError('Unexpected token %s' % token)
+            else:
+                if key is None:
+                    key = token
+                else:
+                    result[key] = token
+                    key = None
+        return result
