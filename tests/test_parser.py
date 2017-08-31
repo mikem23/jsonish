@@ -30,3 +30,15 @@ class TestParser(unittest.TestCase):
             chk = parse(enc)
             self.assertEqual(chk, value)
 
+    bare_data = [
+            [''' {a:1, b:2, cee:dee} ''',
+                {'a':1, 'b':2, 'cee': 'dee'}],
+            [''' ["hello", world, 1, two, '3'] ''',
+                ["hello", "world", 1, "two", "3"]],
+            ]
+
+    def test_bare(self):
+        data = self.bare_data
+        for enc, value in data:
+            chk = parse(enc)
+            self.assertEqual(chk, value)
