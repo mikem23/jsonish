@@ -101,15 +101,20 @@ class Tokenizer(object):
         result = cStringIO()
         for c in self.stream:
             if escape:
+                escape = False
                 if c in ESCAPES:
+                    print("Escape char: %r" % c)
                     result.write(ESCAPES[c])
                 else:
                     raise ValueError('Invalid escape: \\%s' % c)
             elif c == '\\':
+                print('escape start')
                 escape = True
             elif c == quote:
+                print('string stop')
                 break
             else:
+                print('string char: %s' % c)
                 result.write(c)
         ret = result.getvalue()
         return ret
