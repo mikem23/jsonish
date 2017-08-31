@@ -1,4 +1,4 @@
-import cStringIO
+from six.moves import cStringIO
 
 
 def oldparse(data):
@@ -217,7 +217,7 @@ class Tokenizer(object):
 
     def do_string(self, quote):
         escape = False
-        result = cStringIO.StringIO()
+        result = cStringIO()
         for c in self.stream:
             if escape:
                 if c in ESCAPES:
@@ -243,7 +243,7 @@ class Tokenizer(object):
 
     def do_token(self, lead):
         print('reading bare token: lead=%r' % lead)
-        result = cStringIO.StringIO()
+        result = cStringIO()
         result.write(lead)
         tail = ''
         for c in self.stream:
