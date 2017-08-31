@@ -190,22 +190,28 @@ class Tokenizer(object):
 
     def tokenize(self):
         for c in self.stream:
-            print(": %r" % c)
-            if c in TOKENS:
-                r = TOKENS[c]
-                print("token: %r", r)
-                yield r
-            elif c in ('"', "'"):
-                r = self.do_string(c)
-                print("string: %r" % r)
-                yield r
-            elif c == '#':
-                self.do_comment()
-            elif c in WHITESPACE:
-                # skip
-                pass
-            else:
-                yield self.do_token(c)
+            # inner loop allows handlers to push handling back up
+            while True:
+                print(": %r" % c)
+                if c in TOKENS:
+                    r = TOKENS[c]
+                    print("token: %r", r)
+                    yield r
+                elif c in ('"', "'"):
+                    r = self.do_string(c)
+                    print("string: %r" % r)
+                    yield r
+                elif c == '#':
+                    self.do_comment()
+                elif c in WHITESPACE:
+                    # skip
+                    pass
+                else:
+                    bare, c = self.do_token(c)
+                    yield bare
+                    if c:
+                        continue
+                break
 
     def do_string(self, quote):
         escape = False
@@ -235,15 +241,19 @@ class Tokenizer(object):
         print('reading bare token: lead=%r' % lead)
         result = cStringIO.StringIO()
         result.write(lead)
+        tail = ''
         for c in self.stream:
             if c in WHITESPACE:
                 # end token
+                break
+            elif c in TOKENS:
+                tail = c
                 break
             else:
                 result.write(c)
         ret = result.getvalue()
         print('Got bare token: %r' % ret)
-        return BareToken(ret)
+        return BareToken(ret), tail
 
 
 class TokenParser(object):
@@ -320,6 +330,8 @@ class TokenParser(object):
                 raise ValueError('Unclosed list')
             elif token is EndBracket:
                 break
+            elif token is Comma:
+                pass
             elif isinstance(token, Token):
                 raise ValueError('Unexpected token %s' % token)
             else:
