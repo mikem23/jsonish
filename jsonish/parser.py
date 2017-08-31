@@ -247,6 +247,7 @@ class Tokenizer(object):
                 # end token
                 break
             elif c in TOKENS:
+                # end bare token, but pass this char back for further processing
                 tail = c
                 break
             else:

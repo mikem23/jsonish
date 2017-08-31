@@ -42,3 +42,20 @@ class TestParser(unittest.TestCase):
         for enc, value in data:
             chk = parse(enc)
             self.assertEqual(chk, value)
+
+    comment_data = [
+            [''' {a:1,  # This is key "a"
+                  b:2,  # this is key 'b'
+                  cee:dee, # this is key cee, an{y}th[i]ng goes, in a comm:ent
+                  }
+                ''',
+                {'a':1, 'b':2, 'cee': 'dee'}],
+            [''' ["hello", world, 1, two, '3'] #''',
+                ["hello", "world", 1, "two", "3"]],
+            ]
+
+    def test_comments(self):
+        data = self.comment_data
+        for enc, value in data:
+            chk = parse(enc)
+            self.assertEqual(chk, value)
