@@ -155,8 +155,7 @@ class TokenParser(object):
 
     def parse(self):
         items = []
-        while True:
-            token = self._parse()
+        for token in self._parse():
             print("got token: %r" % token)
             if token is END:
                 break
@@ -172,19 +171,36 @@ class TokenParser(object):
         return items[0]
 
     def _parse(self):
+        stringbuf = []  # for implicit string joins
         for token in self.tokens:
-            if token is Brace:
-                return self.parse_dict()
-            elif token is Bracket:
-                return self.parse_list()
-            elif isinstance(token, Token):
-                return token
-            elif isinstance(token, BareToken):
-                return self.parse_bare(token)
+            print("stringbuf: %r" % stringbuf)
+            if isinstance(token, BareToken):
+                val = self.parse_bare(token)
+                if isinstance(val, str):
+                    stringbuf.append(val)
+                    continue
+                else:
+                    yield val
             elif isinstance(token, str):
-                return token
+                stringbuf.append(token)
+                continue
+            if stringbuf:
+                s = ' '.join(stringbuf)
+                print('joined: %r' % s)
+                yield s
+                stringbuf = []
+            if token is Brace:
+                yield self.parse_dict()
+            elif token is Bracket:
+                yield self.parse_list()
+            elif isinstance(token, Token):
+                yield token
+        if stringbuf:
+            s = ' '.join(stringbuf)
+            print('joined: %r' % s)
+            yield s
         print('END')
-        return END
+        yield END
 
     BARE_VALUES = {
             'true': True,
@@ -210,13 +226,13 @@ class TokenParser(object):
             return float(text)
         except ValueError:
             pass
+        print("bare: %r" % text)
         return text
 
     def parse_list(self):
         result = []
-        while True:
-            token = self._parse()
-            print("got token: %r" % token)
+        for token in self._parse():
+            print("list token: %r" % token)
             if token is END:
                 raise ValueError('Unclosed list')
             elif token is EndBracket:
@@ -232,9 +248,8 @@ class TokenParser(object):
     def parse_dict(self):
         result = {}
         key = None
-        while True:
-            token = self._parse()
-            print("got token: %r" % token)
+        for token in self._parse():
+            print("dict token: %r" % token)
             if token is END:
                 raise ValueError('Unclosed dict')
             elif token is EndBrace:

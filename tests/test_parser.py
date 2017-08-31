@@ -82,3 +82,21 @@ class TestParser(unittest.TestCase):
         for enc, value in data:
             chk = parse(enc)
             self.assertEqual(chk, value)
+
+    join_data = [
+            [
+                ''' "hello" "world" ''',
+                "hello world"],
+            [
+                ''' hello world ''',
+                "hello world"],
+            [
+                ''' hello "world" ''',
+                "hello world"],
+        ]
+
+    def test_implicit_join(self):
+        data = self.join_data
+        for enc, value in data:
+            chk = parse(enc)
+            self.assertEqual(chk, value)
