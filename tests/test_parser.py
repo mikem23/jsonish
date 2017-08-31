@@ -50,8 +50,27 @@ class TestParser(unittest.TestCase):
                   }
                 ''',
                 {'a':1, 'b':2, 'cee': 'dee'}],
-            [''' ["hello", world, 1, two, '3'] #''',
-                ["hello", "world", 1, "two", "3"]],
+            [''' # Hello, have some json
+                [
+                    [ # empty list. this ] doesn't count
+                        ],  # <- but this one does
+                    {hello: 1,
+                        world: #comments ok here
+                            2,
+                        foo: [1,   2,   3,
+                                { bar: "bar" # deep comment
+                                }
+                            ]
+                        }
+                    ]
+                ''',
+                [[],
+                    {"hello":1,
+                        "world": 2,
+                        "foo": [1, 2, 3, {"bar": "bar"}]
+                        }
+                    ]
+                ],
             ]
 
     def test_comments(self):
