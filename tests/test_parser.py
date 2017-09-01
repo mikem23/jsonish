@@ -131,6 +131,25 @@ class TestParser(unittest.TestCase):
             with self.assertRaises(ValueError):
                 chk = parse(enc)
 
+    escape_data = [
+            r' "\"" ',
+            r' "\\" ',
+            r' "\/" ',
+            r' "\b" ',
+            r' "\f" ',
+            r' "\n" ',
+            r' "\r" ',
+            r' "\t" ',
+            #r' "\u0001" ',
+        ]
+
+    def test_escape(self):
+        data = self.escape_data
+        for enc in data:
+            value = json.loads(enc)
+            chk = parse(enc)
+            self.assertEqual(chk, value)
+
 
 class TestBareToken(unittest.TestCase):
 
