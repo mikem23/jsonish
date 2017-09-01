@@ -2,6 +2,7 @@
 Turn various types of objects into a character iterator
 '''
 
+from __future__ import absolute_import
 import six
 import types
 
@@ -14,8 +15,6 @@ class Streamer(object):
     def stream(self):
         if isinstance(self.source, six.string_types):
             return self.gen_string()
-        elif isinstance(self.source, file):
-            return self.gen_file()
         elif isinstance(self.source, (list, tuple, types.GeneratorType)):
             return self.gen_iter()
         elif hasattr(self.source, 'read'):

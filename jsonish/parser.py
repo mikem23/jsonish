@@ -1,5 +1,6 @@
+from __future__ import absolute_import
 from six.moves import cStringIO
-from streamer import Streamer
+from .streamer import Streamer
 
 
 def parse(data):
