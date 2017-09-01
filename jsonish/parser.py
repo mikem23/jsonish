@@ -179,7 +179,7 @@ class TokenParser(object):
             print("stringbuf: %r" % stringbuf)
             if isinstance(token, BareToken):
                 val = self.parse_bare(token)
-                if isinstance(val, str):
+                if isinstance(val, BareToken):
                     stringbuf.append(val)
                     continue
                 else:
@@ -188,9 +188,8 @@ class TokenParser(object):
                 stringbuf.append(token)
                 continue
             if stringbuf:
-                s = ' '.join(stringbuf)
-                print('joined: %r' % s)
-                yield s
+                result = self._join_buf(stringbuf)
+                yield result
                 stringbuf = []
             if token is Brace:
                 yield self.parse_dict()
@@ -199,11 +198,25 @@ class TokenParser(object):
             elif isinstance(token, Token):
                 yield token
         if stringbuf:
-            s = ' '.join(stringbuf)
-            print('joined: %r' % s)
-            yield s
+            result = self._join_buf(stringbuf)
+            yield result
         print('END')
         yield END
+
+    def _join_buf(self, stringbuf):
+        result = cStringIO()
+        last = None
+        for val in stringbuf:
+            if isinstance(val, BareToken):
+                print("Bare token in implicit join: %r" % val)
+                # if there are any bare tokens, join with ' '
+                # XXX is this the right logic?
+                result = ' '.join([str(s) for s in stringbuf])
+                break
+        else:
+            result = ''.join(stringbuf)
+        print('joined: %r' % result)
+        return result
 
     BARE_VALUES = {
             'true': True,
@@ -230,7 +243,7 @@ class TokenParser(object):
         except ValueError:
             pass
         print("bare: %r" % text)
-        return text
+        return token
 
     def parse_list(self):
         result = []

@@ -87,7 +87,7 @@ class TestParser(unittest.TestCase):
 
     join_data = [
             [
-                ''' "hello" "world" ''',
+                ''' "hello " "world" ''',
                 "hello world"],
             [
                 ''' hello world ''',
@@ -95,6 +95,15 @@ class TestParser(unittest.TestCase):
             [
                 ''' hello "world" ''',
                 "hello world"],
+            [
+                ''' a "b" c "d" e ''',
+                "a b c d e"],
+            [
+                ''' a b c d e ''',
+                "a b c d e"],
+            [
+                ''' "a" "b" 'c' 'd' "e" ''',
+                "abcde"],
         ]
 
     def test_implicit_join(self):
