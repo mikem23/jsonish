@@ -155,6 +155,24 @@ class TestParser(unittest.TestCase):
             chk = parse(enc)
             self.assertEqual(chk, value)
 
+    bad_data = [
+            r''' : ''',
+            r''' } ''',
+            r''' ] ''',
+            r'',
+            r''' [] [] ''',
+            r''' [} ''',
+            r''' [:] ''',
+            r''' {] ''',
+            r''' {:} ''',
+        ]
+
+    def test_bad_data(self):
+        data = self.bad_data
+        for enc in data:
+            with self.assertRaises(ValueError):
+                chk = parse(enc)
+
 
 class TestBareToken(unittest.TestCase):
 
