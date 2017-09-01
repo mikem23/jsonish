@@ -17,7 +17,7 @@ class Streamer(object):
         elif isinstance(self.source, file):
             return self.gen_file()
         elif isinstance(self.source, (list, tuple, types.GeneratorType)):
-            resutn self.gen_iter()
+            return self.gen_iter()
         elif hasattr(self.source, 'read'):
             return self.gen_file()
         elif hasattr(self.source, '__iter__'):

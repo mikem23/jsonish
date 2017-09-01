@@ -1,4 +1,5 @@
 from six.moves import cStringIO
+from streamer import Streamer
 
 
 def parse(data):
@@ -54,22 +55,12 @@ ESCAPES = {
         }
 
 
-def strgen(s):
-    """Turn a string into a character generator"""
-    for c in s:
-        yield c
-
-
 class Tokenizer(object):
 
-    def __init__(self, stream):
-        print("Tokenizer for: %r" % stream)
-        if isinstance(stream, str):
-            print(stream)
-            self.stream = strgen(stream)
-        else:
-            print(type(stream))
-            self.stream = stream
+    def __init__(self, source):
+        print("Tokenizer for: %r" % source)
+        self.streamer = Streamer(source)
+        self.stream = self.streamer.stream()
 
     def tokenize(self):
         for c in self.stream:
@@ -149,8 +140,8 @@ class Tokenizer(object):
 
 class TokenParser(object):
 
-    def __init__(self, stream):
-        self.tokenizer = Tokenizer(stream)
+    def __init__(self, source):
+        self.tokenizer = Tokenizer(source)
         self.tokens = self.tokenizer.tokenize()
 
     def parse(self):
