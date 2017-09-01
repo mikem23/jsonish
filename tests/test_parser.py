@@ -104,6 +104,9 @@ class TestParser(unittest.TestCase):
             [
                 ''' "a" "b" 'c' 'd' "e" ''',
                 "abcde"],
+            [
+                ''' "a" "b" 'c' 'd' e ''',
+                "abcd e"],
         ]
 
     def test_implicit_join(self):

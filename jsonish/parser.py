@@ -204,19 +204,18 @@ class TokenParser(object):
         yield END
 
     def _join_buf(self, stringbuf):
+        print("joining stringbuf: %r" % stringbuf)
         result = cStringIO()
         last = None
         for val in stringbuf:
-            if isinstance(val, BareToken):
-                print("Bare token in implicit join: %r" % val)
-                # if there are any bare tokens, join with ' '
-                # XXX is this the right logic?
-                result = ' '.join([str(s) for s in stringbuf])
-                break
-        else:
-            result = ''.join(stringbuf)
+            if last is not None:
+                # bare tokens get space separated
+                if isinstance(last, BareToken) or isinstance(val, BareToken):
+                    result.write(' ')
+            last = val
+            result.write(str(val))
         print('joined: %r' % result)
-        return result
+        return result.getvalue()
 
     BARE_VALUES = {
             'true': True,
