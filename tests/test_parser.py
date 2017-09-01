@@ -1,6 +1,7 @@
 import unittest
 
 import json
+import jsonish.parser
 from jsonish.parser import parse
 from jsonish.parser import BareToken
 
@@ -123,6 +124,7 @@ class TestParser(unittest.TestCase):
             r''' ["\6"] ''',
             r''' {a:"\6"} ''',
             r''' "\i" ''',
+            r''' "\u0"''',
         ]
 
     def test_bad_escape(self):
@@ -164,3 +166,11 @@ class TestBareToken(unittest.TestCase):
         t = BareToken('4.5')
         r = repr(t)
         self.assertEqual(r[:10], 'BareToken(')
+
+
+class TestToken(unittest.TestCase):
+
+    def test_str(self):
+        self.assertEqual(str(jsonish.parser.Brace), '{')
+        self.assertEqual(str(jsonish.parser.Comment), '#')
+        self.assertEqual(str(jsonish.parser.END), '')

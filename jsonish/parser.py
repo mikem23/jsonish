@@ -109,18 +109,18 @@ class Tokenizer(object):
         return ret
 
     def do_escape(self):
-        code = next(self.stream)
-        if code in ESCAPES:
-            print("Escape char: %r" % code)
-            return ESCAPES[code]
-        elif code == 'u':
-            xdigits = ''.join([next(self.stream) for i in range(4)])
-            if len(xdigits) != 4:
-                # can this happen?
-                raise ValueError('Invalid unicode escape')
-            return six.unichr(int(xdigits, 16))
-        else:
-            raise ValueError('Invalid escape: \\%s' % code)
+        try:
+            code = next(self.stream)
+            if code in ESCAPES:
+                print("Escape char: %r" % code)
+                return ESCAPES[code]
+            elif code == 'u':
+                xdigits = ''.join([next(self.stream) for i in range(4)])
+                return six.unichr(int(xdigits, 16))
+            else:
+                raise ValueError('Invalid escape: \\%s' % code)
+        except StopIteration:
+            raise ValueError('Incomplete escape')
 
     def do_comment(self):
         print('comment start')
