@@ -100,3 +100,19 @@ class TestParser(unittest.TestCase):
         for enc, value in data:
             chk = parse(enc)
             self.assertEqual(chk, value)
+
+    unclosed_data = [
+            ''' [ ''',
+            ''' [1, ''',
+            ''' [1, 2, 3, [], [] ''',
+            ''' {a:1, ''',
+            ''' {a:1, b:2, c:3, d:{}, e:[] ''',
+            ''' {, ''',
+            ''' {a, ''',
+        ]
+
+    def test_unclosed(self):
+        data = self.unclosed_data
+        for enc in data:
+            with self.assertRaises(ValueError):
+                chk = parse(enc)
