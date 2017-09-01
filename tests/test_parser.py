@@ -116,3 +116,16 @@ class TestParser(unittest.TestCase):
         for enc in data:
             with self.assertRaises(ValueError):
                 chk = parse(enc)
+
+    bad_escape_data = [
+            r''' "\6" ''',
+            r''' ["\6"] ''',
+            r''' {a:"\6"} ''',
+            r''' "\i" ''',
+        ]
+
+    def test_bad_escape(self):
+        data = self.bad_escape_data
+        for enc in data:
+            with self.assertRaises(ValueError):
+                chk = parse(enc)
