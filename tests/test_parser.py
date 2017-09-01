@@ -2,6 +2,7 @@ import unittest
 
 import json
 from jsonish.parser import parse
+from jsonish.parser import BareToken
 
 
 class TestParser(unittest.TestCase):
@@ -129,3 +130,15 @@ class TestParser(unittest.TestCase):
         for enc in data:
             with self.assertRaises(ValueError):
                 chk = parse(enc)
+
+
+class TestBareToken(unittest.TestCase):
+
+    def test_bare_token_string(self):
+        s = BareToken('4.5')
+        self.assertEqual(str(s), '4.5')
+
+    def test_bare_token_repr(self):
+        t = BareToken('4.5')
+        r = repr(t)
+        self.assertEqual(r[:10], 'BareToken(')

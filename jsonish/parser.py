@@ -41,7 +41,7 @@ class BareToken(object):
         return self.text
 
     def __repr__(self):
-        return 'Bare(%r)' % self.text
+        return 'BareToken(%r)' % self.text
 
 
 ESCAPES = {
