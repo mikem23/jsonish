@@ -16,10 +16,14 @@ class Streamer(object):
             return self.gen_string()
         elif isinstance(self.source, file):
             return self.gen_file()
-        elif isinstance(self.source, types.GeneratorType):
-            resutn self.gen_gen()
-        elif hasattr(self.source, read):
+        elif isinstance(self.source, (list, tuple, types.GeneratorType)):
+            resutn self.gen_iter()
+        elif hasattr(self.source, 'read'):
             return self.gen_file()
+        elif hasattr(self.source, '__iter__'):
+            return self.gen_iter()
+        # TODO: buffer, bytearray
+        # TODO: memoryview ?
 
     def gen_string(self):
         for c in self.source:
@@ -30,8 +34,8 @@ class Streamer(object):
             for c in chunk:
                 yield c
 
-    def gen_gen(self):
-        '''Turn a string generator into a charactor generator'''
+    def gen_iter(self):
+        '''Turn a string list/generator into a charactor generator'''
         for part in self.source:
             for c in part:
                 yield c
