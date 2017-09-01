@@ -1,5 +1,6 @@
 from __future__ import absolute_import
-from six.moves import cStringIO
+import six
+from six.moves import cStringIO, range
 from .streamer import Streamer
 
 
@@ -92,19 +93,12 @@ class Tokenizer(object):
                 break
 
     def do_string(self, quote):
-        escape = False
         result = cStringIO()
         for c in self.stream:
-            if escape:
-                escape = False
-                if c in ESCAPES:
-                    print("Escape char: %r" % c)
-                    result.write(ESCAPES[c])
-                else:
-                    raise ValueError('Invalid escape: \\%s' % c)
-            elif c == '\\':
+            if c == '\\':
                 print('escape start')
-                escape = True
+                esc = self.do_escape()
+                result.write(esc)
             elif c == quote:
                 print('string stop')
                 break
@@ -113,6 +107,20 @@ class Tokenizer(object):
                 result.write(c)
         ret = result.getvalue()
         return ret
+
+    def do_escape(self):
+        code = next(self.stream)
+        if code in ESCAPES:
+            print("Escape char: %r" % code)
+            return ESCAPES[code]
+        elif code == 'u':
+            xdigits = ''.join([next(self.stream) for i in range(4)])
+            if len(xdigits) != 4:
+                # can this happen?
+                raise ValueError('Invalid unicode escape')
+            return six.unichr(int(xdigits, 16))
+        else:
+            raise ValueError('Invalid escape: \\%s' % code)
 
     def do_comment(self):
         print('comment start')

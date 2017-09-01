@@ -140,7 +140,10 @@ class TestParser(unittest.TestCase):
             r' "\n" ',
             r' "\r" ',
             r' "\t" ',
-            #r' "\u0001" ',
+            # note \' not valid in json
+            r' "\u0001" ',
+            r' "\u0001" ',
+            r' "\u0032" ',
         ]
 
     def test_escape(self):
