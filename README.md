@@ -58,7 +58,7 @@ The hash character (`#`) marks the start of a comment, which continues until
 the end of line. All characters in comments are ignored.
 
     {   name: Arthur,
-        title: King of the Britons  # well, I didn't vote for him
+        title: King of the Britons,  # well, I didn't vote for him
         # (you don't vote for kings)
         address: Camelot,  # it's only a modeel
         quest: To seek the Holy Grail,  # or at least a grail shaped beaon
