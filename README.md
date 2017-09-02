@@ -11,6 +11,7 @@ conveniences, such as:
   * comments
   * single quotes for strings
 
+
 bare words
 ----------
 
@@ -18,10 +19,15 @@ Bare words are allowed in place of quoted strings. For example the following
 syntax pairs are equivalent:
 
     [ hello world ]
+    [ hello    world ]
     [ "hello world" ]
+
+Special characters (like `,`) are not included in the bare word.
 
     [ hello, world ]
     [ "hello",  "world" ]
+
+Bare words are allowed in array keys too
 
     {a:1, b:2}
     {"a":1, "b":2}
@@ -41,11 +47,25 @@ is done with no separator if both are quoted strings. If either string is
 a bare word, then the values are joined with a space.
 
 
+    [ I "like " 'traffic' lights ]
+    [ "I like traffic lights" ]
+
+
 comments
 --------
 
 The hash character (`#`) marks the start of a comment, which continues until
 the end of line. All characters in comments are ignored.
+
+    {   name: Arthur,
+        title: King of the Britons  # well, I didn't vote for him
+        # (you don't vote for kings)
+        address: Camelot,  # it's only a modeel
+        quest: To seek the Holy Grail,  # or at least a grail shaped beaon
+    }
+    
+    {"name": "Arthur", "title": "King of the Britons", "address": "Camelot",
+        "quest": "To seek the Holy Grail"}
 
 
 single quoted strings
