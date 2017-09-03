@@ -49,15 +49,17 @@ class BareToken(object):
 
 
 ESCAPES = {
+        # standard json escapes (single char)
         '\\': '\\',
         'n': '\n',
         'r': '\r',
         't': '\t',
         '"': '"',
-        "'": "'",
         '/': '/',
         'b': '\b',
         'f': '\f',
+        # also single quote
+        "'": "'",
         }
 
 
