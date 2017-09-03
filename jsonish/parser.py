@@ -16,6 +16,7 @@ class Token(object):
 
     def __init__(self, name):
         self.name = name
+        assert name not in TOKENS
         TOKENS[name] = self
 
     def __str__(self):
