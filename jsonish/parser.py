@@ -167,13 +167,13 @@ class TokenParser(object):
                 break
             elif isinstance(token, Token):
                 raise ValueError('Unexpected token %s' % token)
+            elif items:
+                raise ValueError('Multiple json outputs found')
+                # TODO: maybe support this with an option
             else:
                 items.append(token)
         if not items:
             raise ValueError('No json data found')
-        elif len(items) > 1:
-            raise ValueError('Multiple json outputs found')
-            # TODO: maybe support this with an option
         return items[0]
 
     def _parse(self):
