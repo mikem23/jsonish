@@ -66,7 +66,6 @@ ESCAPES = {
 class Tokenizer(object):
 
     def __init__(self, source):
-        print("Tokenizer for: %r" % source)
         self.streamer = Streamer(source)
         self.stream = self.streamer.stream()
 
@@ -74,16 +73,13 @@ class Tokenizer(object):
         for c in self.stream:
             # inner loop allows handlers to push handling back up
             while True:
-                print(": %r" % c)
                 if c == '#':
                     self.do_comment()
                 elif c in TOKENS:
                     r = TOKENS[c]
-                    print("token: %r" % r)
                     yield r
                 elif c in ('"', "'"):
                     r = self.do_string(c)
-                    print("string: %r" % r)
                     yield r
                 elif c in WHITESPACE:
                     # skip
@@ -99,14 +95,11 @@ class Tokenizer(object):
         result = cStringIO()
         for c in self.stream:
             if c == '\\':
-                print('escape start')
                 esc = self.do_escape()
                 result.write(esc)
             elif c == quote:
-                print('string stop')
                 break
             else:
-                print('string char: %s' % c)
                 result.write(c)
         ret = result.getvalue()
         return ret
@@ -115,7 +108,6 @@ class Tokenizer(object):
         try:
             code = next(self.stream)
             if code in ESCAPES:
-                print("Escape char: %r" % code)
                 return ESCAPES[code]
             elif code == 'u':
                 xdigits = ''.join([next(self.stream) for i in range(4)])
@@ -126,15 +118,12 @@ class Tokenizer(object):
             raise ValueError('Incomplete escape')
 
     def do_comment(self):
-        print('comment start')
         # just read to end of line
         for c in self.stream:
-            print('comment char: %r' % c)
             if c == '\n':
                 break
 
     def do_token(self, lead):
-        print('reading bare token: lead=%r' % lead)
         result = cStringIO()
         result.write(lead)
         tail = ''
@@ -149,7 +138,6 @@ class Tokenizer(object):
             else:
                 result.write(c)
         ret = result.getvalue()
-        print('Got bare token: %r' % ret)
         return BareToken(ret), tail
 
 
@@ -162,7 +150,6 @@ class TokenParser(object):
     def parse(self):
         items = []
         for token in self._parse():
-            print("got token: %r" % token)
             if token is END:
                 break
             elif isinstance(token, Token):
@@ -179,7 +166,6 @@ class TokenParser(object):
     def _parse(self):
         stringbuf = []  # for implicit string joins
         for token in self.tokens:
-            print("stringbuf: %r" % stringbuf)
             if isinstance(token, BareToken):
                 val = self.parse_bare(token)
                 if isinstance(val, BareToken):
@@ -203,11 +189,9 @@ class TokenParser(object):
         if stringbuf:
             result = self._join_buf(stringbuf)
             yield result
-        print('END')
         yield END
 
     def _join_buf(self, stringbuf):
-        print("joining stringbuf: %r" % stringbuf)
         result = cStringIO()
         last = None
         for val in stringbuf:
@@ -217,7 +201,6 @@ class TokenParser(object):
                     result.write(' ')
             last = val
             result.write(str(val))
-        print('joined: %r' % result)
         return result.getvalue()
 
     BARE_VALUES = {
@@ -244,13 +227,11 @@ class TokenParser(object):
             return float(text)
         except ValueError:
             pass
-        print("bare: %r" % text)
         return token
 
     def parse_list(self):
         result = []
         for token in self._parse():
-            print("list token: %r" % token)
             if token is END:
                 raise ValueError('Unclosed list')
             elif token is EndBracket:
@@ -267,7 +248,6 @@ class TokenParser(object):
         result = {}
         key = None
         for token in self._parse():
-            print("dict token: %r" % token)
             if token is END:
                 raise ValueError('Unclosed dict')
             elif token is EndBrace:
