@@ -237,11 +237,14 @@ class TokenParser(object):
             elif token is EndBracket:
                 break
             elif token is Comma:
-                pass
+                if not result or last is Comma:
+                    raise ValueError('Blank entry in list')
             elif isinstance(token, Token):
                 raise ValueError('Unexpected token %s' % token)
             else:
                 result.append(token)
+            last = token
+
         return result
 
     def parse_dict(self):
