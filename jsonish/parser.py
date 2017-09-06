@@ -1,7 +1,12 @@
 from __future__ import absolute_import
 import six
-from six.moves import cStringIO, range
+from six.moves import range
 from .streamer import Streamer
+if six.PY2:
+    # py2 cStringIO doesn't handle unicode
+    from six.moves import StringIO
+else:
+    from six.moves import cStringIO as StringIO
 
 
 def parse(data):
@@ -92,7 +97,7 @@ class Tokenizer(object):
                 break
 
     def do_string(self, quote):
-        result = cStringIO()
+        result = StringIO()
         for c in self.stream:
             if c == '\\':
                 esc = self.do_escape()
@@ -124,7 +129,7 @@ class Tokenizer(object):
                 break
 
     def do_token(self, lead):
-        result = cStringIO()
+        result = StringIO()
         result.write(lead)
         tail = ''
         for c in self.stream:
@@ -173,7 +178,7 @@ class TokenParser(object):
                     continue
                 else:
                     yield val
-            elif isinstance(token, str):
+            elif isinstance(token, six.string_types):
                 stringbuf.append(token)
                 continue
             if stringbuf:
@@ -192,16 +197,16 @@ class TokenParser(object):
         yield END
 
     def _join_buf(self, stringbuf):
-        result = cStringIO()
+        newbuf = []
         last = None
         for val in stringbuf:
             if last is not None:
                 # bare tokens get space separated
                 if isinstance(last, BareToken) or isinstance(val, BareToken):
-                    result.write(' ')
+                    newbuf.append(' ')
             last = val
-            result.write(str(val))
-        return result.getvalue()
+            newbuf.append(six.text_type(val))
+        return ''.join(newbuf)
 
     BARE_VALUES = {
             'true': True,
@@ -227,7 +232,7 @@ class TokenParser(object):
             return float(text)
         except ValueError:
             pass
-        if str(token)[0].isdigit():
+        if six.text_type(token)[0].isdigit():
             raise ValueError('Strings beginning with numbers must be quoted')
         return token
 
