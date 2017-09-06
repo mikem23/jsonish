@@ -227,6 +227,8 @@ class TokenParser(object):
             return float(text)
         except ValueError:
             pass
+        if str(token)[0].isdigit():
+            raise ValueError('Strings beginning with numbers must be quoted')
         return token
 
     def parse_list(self):

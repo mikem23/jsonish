@@ -35,6 +35,9 @@ Bare words are allowed in array keys too
 Bare words cannot contain any special characters (`{}[]:,#'"`), whitespace, or
 escaped characters. For such values, use a quoted string.
 
+Also, bare words may not begin with a digit. This prevents poorly formatted
+numbers from being parsed as a bare word. For such values, use a quoted string.
+
 Adjacent bare words are joined with a space, as are bare words adjacent to
 quoted strings.
 
@@ -60,7 +63,7 @@ the end of line. All characters in comments are ignored.
     {   name: Arthur,
         title: King of the Britons,  # well, I didn't vote for him
         # (you don't vote for kings)
-        address: Camelot,  # it's only a modeel
+        address: Camelot,  # it's only a model
         quest: To seek the Holy Grail,  # or at least a grail shaped beaon
     }
     
@@ -73,3 +76,11 @@ single quoted strings
 
 Quoted strings may use either single or double quotes, as long as they match.
 Either quotation mark may be escaped in strings, regardless of the quote used.
+
+
+other conveniences
+------------------
+
+    * trailing commas are allowed in lists and dictionaries
+    * accepts broader numeric formats
+    * control characters allowed in strings
