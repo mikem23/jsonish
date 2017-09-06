@@ -246,24 +246,26 @@ class TokenParser(object):
 
     def parse_dict(self):
         result = {}
-        key = None
-        for token in self._parse():
-            if token is END:
-                raise ValueError('Unclosed dict')
-            elif token is EndBrace:
+        parser = self._parse()
+        while True:
+            key = next(parser)
+            if key is EndBrace:
                 break
-            elif token is Colon:
-                if key is None:
-                    raise ValueError('Missing key in dictionary')
-            elif token is Comma:
-                if key is not None:
-                    raise ValueError('Unexpected comma in dictionary')
-            elif isinstance(token, Token):
-                raise ValueError('Unexpected token %s' % token)
-            else:
-                if key is None:
-                    key = token
-                else:
-                    result[key] = token
-                    key = None
+            elif key is END:
+                raise ValueError('Unclosed dictionary')
+            colon = next(parser)
+            if colon is not Colon:
+                raise ValueError('Missing colon in dictionary')
+            value = next(parser)
+            if value is END:
+                raise ValueError('Incomplete dictionary entry')
+            elif isinstance(value, Token):
+                raise ValueError('Unexpected token %s' % value)
+            result[key] = value
+            comma = next(parser)
+            if comma is Comma:
+                # this is what we expect
+                pass
+            elif comma is EndBrace:
+                break
         return result
