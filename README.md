@@ -61,13 +61,13 @@ comments
 The hash character (`#`) marks the start of a comment, which continues until
 the end of line. All characters in comments are ignored.
 
->>> jsonish.parse(r'''
-... {   name: Arthur,
-...     title: King of the Britons,  # well, I didn't vote for him
-...     address: Camelot,  # it's only a model
-...     quest: To seek the Holy Grail,
-... } ''')
-{u'quest': u'To seek the Holy Grail', u'address': u'Camelot', u'name': u'Arthur', u'title': u'King of the Britons'}
+    >>> jsonish.parse(r'''
+    ... {   name: Arthur,
+    ...     title: King of the Britons,  # well, I didn't vote for him
+    ...     address: Camelot,  # it's only a model
+    ...     quest: To seek the Holy Grail,
+    ... } ''')
+    {u'quest': u'To seek the Holy Grail', u'address': u'Camelot', u'name': u'Arthur', u'title': u'King of the Britons'}
 
 
 single quoted strings
